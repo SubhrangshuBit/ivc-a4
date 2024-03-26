@@ -1,0 +1,58 @@
+Hi all,
+
+Here are some links that can help you get started on SCC with a GPU. We assume you are familiar with working on Linux/Unix terminals to a certain degree, so we will skip details such as how to create a directory, ssh, etc. If you have never used these things before, this is the best time to make friends with people who have experience with this in the class :)
+
+1. ssh to a guest node in SCC (e.g. ssh {yourbuname}@scc1.bu.edu), then request and login to a node with the acquired GPU.
+
+Especially, look at the example in "Interactive Batch".
+
+https://www.bu.edu/tech/support/research/software-and-programming/programming/multiprocessor/gpu-computing/#RUNNINGONGPUS
+
+After logging in to the node with a GPU, try "nvidia-smi" and see if there is any GPU information returned. If not, that means you are still in a guest node and you need to request for a GPU before moving on.
+
+2. Create a conda virtual environment for your project/homework:
+
+Remember, you should load 'miniconda' module instead of 'conda' (note, you should LOAD the miniconda module provided by SCC instead of trying to install the anaconda yourself!!!).
+
+https://www.bu.edu/tech/support/research/software-and-programming/common-languages/python/anaconda/
+
+after loading the module, you should be able to call 'conda' in the terminal. Create a conda virtual environment like you did before in your local machine.
+
+Install any libraries/packages you need for your project/homework. If you have no clue what you need to install, take a look at the "import" lines in your code and Google how to install them in your created virtual environment.
+
+3. Since most of our works are based on Jupyter Notebook, to start coding:
+
+Login to SCC ondemand:
+
+https://scc-ondemand1.bu.edu/pun/sys/dashboard
+
+Look at the top: Interactive Apps -> Jupyter Notebook
+
+Read the following link to know what to fill in to create a Jupyter Notebook server you need for coding. (Note: NEVER try this step until you finished steps 1 & 2, otherwise things will not work)
+
+https://www.bu.edu/tech/support/research/software-and-programming/common-languages/python/jupyter/
+
+The place to save your code and files should be "/projectnb/${cs585_scc_project_name}/{yourbuusername}" {yourbuuername} should be your bu username (mkdir one if you don't have one). Don't put your code directly in the root directory ".../${cs585_scc_project_name}/", or they will be removed whenever we see them.
+
+To check whether the server is created with your conda virtual environment, try importing libraries you installed in step 2 in the Jupyter notebook interface.  For example, if you installed pytorch at step 2, "import torch" should work in your Jupyter Notebook interface now.
+
+------------------------------------------------------------------------------------------
+
+So to summarize how to start with SCC for our homework/project, you need to:
+
+1. request a computing node with a GPU 
+
+2. create a virtual environment with miniconda and install everything you need for the homeworks/projects
+
+3. set up a Jupyter Notebook server that is built on your created virtual environment.
+
+ 
+
+If you have any questions regarding the process above, you should contact the SCC team
+
+help@scc.bu.edu
+
+anytime during working hours.
+
+Or you can talk to me during my office hours.
+
