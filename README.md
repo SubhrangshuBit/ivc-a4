@@ -1,7 +1,9 @@
 # Assignment 4 - Semantic Segmentation
-# Team: 1) Nazia Tasnim and 2) Subhrangshu Bit
+#### Team: 
+  * Nazia Tasnim
+  * Subhrangshu Bit
 
-# Preliminary Instructions
+##### Preliminary Instructions
 1. Download the dataset, place it under this directory and unzip (Done)
 
 2. Install required packages for running our code (using conda (miniconda on SCC) is recommended) (Done)
