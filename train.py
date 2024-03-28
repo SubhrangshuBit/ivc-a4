@@ -37,10 +37,27 @@ dataloader_test = torch.utils.data.DataLoader(camvid_dataset_test, batch_size=1,
 
 # Define the loss function and optimizer
 def loss_fn(outputs, labels):
-    raise NotImplementedError("Implement the loss function")
+    """ 
+    In the original paper, the authors mention a per-pixel multinomial logistic loss, which is equivalent to the standard cross-entropy loss.
+    """ 
+    return torch.nn.CrossEntropyLoss()(outputs, labels)
 
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+def calculate_metrics(pred, target, num_classes):
+    """ 
+    Calculate the pixel accuracy, mean IoU, and frequency weighted IoU.
+    """
+    pixel_acc = (pred == target).sum() / (target.shape[0] * target.shape[1])
+    iou = []
+    for i in range(num_classes):
+        intersection = ((pred == i) & (target == i)).sum()
+        union = ((pred == i) | (target == i)).sum()
+        iou.append(intersection / union)
+    mean_iou = np.mean(iou)
+    freq_iou = np.sum([(target == i).sum() * iou[i] for i in range(num_classes)]) / (target.shape[0] * target.shape[1])
+    return pixel_acc, mean_iou, freq_iou
 
 def eval_model(model, dataloader, device, save_pred=False):
     model.eval()
@@ -56,11 +73,9 @@ def eval_model(model, dataloader, device, save_pred=False):
             _, predicted = torch.max(outputs, 1)
             if save_pred:
                 pred_list.append(predicted.cpu().numpy())
-            raise NotImplementedError("Implement the evaluation metrics")
-        # pixel_acc = ...
-        # mean_iou = ...
-        # freq_iou = ...
+           
         loss = sum(loss_list) / len(loss_list)
+        pixel_acc, mean_iou, freq_iou = calculate_metrics(predicted.cpu().numpy(), labels.cpu().numpy(), num_classes)
         print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f}, Loss: {:.4f}'.format(pixel_acc, mean_iou, freq_iou, loss))
 
     if save_pred:
@@ -122,6 +137,9 @@ for epoch in range(num_epochs):
         if (i+1) % 10 == 0:
             print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, len(dataloader_train), sum(loss_list)/len(loss_list)))
             loss_list = []
+
+    pixel_acc, mean_iou, freq_iou = calculate_metrics(torch.argmax(outputs, dim=1).cpu().numpy(), labels.cpu().numpy(), num_classes)
+    print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f}'.format(pixel_acc, mean_iou, freq_iou))
 
     # eval the model        
     eval_model(model, dataloader_val, device)

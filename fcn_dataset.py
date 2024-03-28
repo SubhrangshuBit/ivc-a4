@@ -49,6 +49,7 @@ class CamVidDataset(Dataset):
             image, label = paired_resize(image, label, self.resolution)
             
         # image to tensor and normalize
+        
         image = transforms.ToTensor()(image)
         image = normalize(image)
         label = torch.tensor(np.array(label)).long()
