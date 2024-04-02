@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 
 # Define the device
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Define the model
 num_classes = 32
@@ -21,6 +21,8 @@ resolution = (384, 512)
 batch_size = 16
 num_epochs = 50
 
+# Define logs
+writer = SummaryWriter()
 
 camvid_dataset_train = fcn_dataset.CamVidDataset(root='CamVid/', images_dir=images_dir_train, labels_dir=labels_dir_train, class_dict_path=class_dict_path, resolution=resolution, crop=True)
 dataloader_train = torch.utils.data.DataLoader(camvid_dataset_train, batch_size=batch_size, shuffle=True, num_workers=4)
@@ -34,6 +36,20 @@ images_dir_test = "test/"
 labels_dir_test = "test_labels/"
 camvid_dataset_test = fcn_dataset.CamVidDataset(root='CamVid/', images_dir=images_dir_test, labels_dir=labels_dir_test, class_dict_path=class_dict_path, resolution=resolution, crop=False)
 dataloader_test = torch.utils.data.DataLoader(camvid_dataset_test, batch_size=1, shuffle=False, num_workers=4, drop_last=False)
+
+# Define the early stopping function
+class EarlyStopping:
+    def __init__(self, tolerance=10, min_delta=0):
+        self.tolerance = tolerance
+        self.min_delta = min_delta
+        self.counter=0
+        self.early_stop=False
+
+    def __call__(self, train_loss, validation_loss):
+        if (validation_loss - train_loss) > self.min_delta:
+            self.counter += 1
+            if self.counter >= self.tolerance:
+                self.early_stop = True
 
 # Define the loss function and optimizer
 def loss_fn(outputs, labels):
@@ -49,14 +65,20 @@ def calculate_metrics(pred, target, num_classes):
     """ 
     Calculate the pixel accuracy, mean IoU, and frequency weighted IoU.
     """
-    pixel_acc = (pred == target).sum() / (target.shape[0] * target.shape[1])
+    total_wt = np.sum([(target == i).sum() for i in range(num_classes)])
+    pixel_acc = (pred == target).sum() / (total_wt)
     iou = []
     for i in range(num_classes):
         intersection = ((pred == i) & (target == i)).sum()
         union = ((pred == i) | (target == i)).sum()
-        iou.append(intersection / union)
+        # For a target image, one or more classes might not be in that image leading to zero union
+        if union>0:
+            iou.append(intersection / union)
+        else:
+            iou.append(0)
+
     mean_iou = np.mean(iou)
-    freq_iou = np.sum([(target == i).sum() * iou[i] for i in range(num_classes)]) / (target.shape[0] * target.shape[1])
+    freq_iou = np.sum([(target == i).sum() * iou[i] for i in range(num_classes)]) / (total_wt)
     return pixel_acc, mean_iou, freq_iou
 
 def eval_model(model, dataloader, device, save_pred=False):
@@ -65,7 +87,7 @@ def eval_model(model, dataloader, device, save_pred=False):
     if save_pred:
         pred_list = []
     with torch.no_grad():
-        for images, labels in dataloader:
+        for images, labels in (dataloader):
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
             loss = loss_fn(outputs, labels)
@@ -76,12 +98,15 @@ def eval_model(model, dataloader, device, save_pred=False):
            
         loss = sum(loss_list) / len(loss_list)
         pixel_acc, mean_iou, freq_iou = calculate_metrics(predicted.cpu().numpy(), labels.cpu().numpy(), num_classes)
+        print("Validation")
         print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f}, Loss: {:.4f}'.format(pixel_acc, mean_iou, freq_iou, loss))
+        print('='*20)
 
     if save_pred:
         pred_list = np.concatenate(pred_list, axis=0)
         np.save('test_pred.npy', pred_list)
     model.train()
+    return loss, pixel_acc, mean_iou, freq_iou
 
 def visualize_model(model, dataloader, device):
     log_dir = "vis/"
@@ -120,6 +145,8 @@ def visualize_model(model, dataloader, device):
     
 # Train the model
 loss_list = []
+epoch_train_loss = []
+early_stopping = EarlyStopping(tolerance=10, min_delta=10)
 for epoch in range(num_epochs):
     for i, (images, labels) in enumerate(dataloader_train):
         images, labels = images.to(device), labels.to(device)
@@ -133,16 +160,31 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         loss_list.append(loss.item())
+        epoch_train_loss.append(loss.item())
 
         if (i+1) % 10 == 0:
             print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, len(dataloader_train), sum(loss_list)/len(loss_list)))
             loss_list = []
 
+    train_loss = sum(epoch_train_loss)/len(epoch_train_loss)
     pixel_acc, mean_iou, freq_iou = calculate_metrics(torch.argmax(outputs, dim=1).cpu().numpy(), labels.cpu().numpy(), num_classes)
+    print("Train")
     print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f}'.format(pixel_acc, mean_iou, freq_iou))
+    print('='*20)
 
     # eval the model        
-    eval_model(model, dataloader_val, device)
+    eval_loss, eval_pixel_acc, eval_mean_iou, eval_freq_iou = eval_model(model, val_loader, device)
+
+    # Log performance
+    writer.add_scalars("Loss", {"train": train_loss, "val": eval_loss}, epoch)
+    writer.add_scalars("PixAcc", {"train": pixel_acc, "val": eval_pixel_acc}, epoch)
+    writer.add_scalars("meanIOU", {"train": mean_iou, "val": eval_mean_iou}, epoch)
+
+    # early stoppping
+    early_stopping(train_loss, eval_loss)
+    if early_stopping.early_stop:
+      print("We are at epoch:", epoch)
+      break
 
 print('='*20)
 print('Finished Training, evaluating the model on the test set')
