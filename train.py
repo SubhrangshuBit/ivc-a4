@@ -9,6 +9,9 @@ from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
 from fcn_dataset import CamVidDataset, rev_normalize
 from fcn_model import FCN8s
+manualSeed = 42
+np.random.seed(manualSeed)
+torch.manual_seed(manualSeed)
 # Define the device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -36,20 +39,20 @@ class EarlyStopping:
         self.min_delta = min_delta
         self.counter=0
         self.early_stop=False
-        self.best_loss = float('inf')
+        self.best_loss = -9999999
 
-    def __call__(self,  validation_loss):
+    def __call__(self,  mean_iou):
         """ 
-        If the validation loss is less than the best loss by min_delta, then reset the counter.
+        If the mean_iou is mode than the best loss by min_delta, then reset the counter.
         """
-        if self.best_loss - validation_loss > self.min_delta:
-            print(f'Validation loss decreased ({self.best_loss:.6f} --> {validation_loss:.6f}).  Resetting counter to 0')
-            self.best_loss = validation_loss
+        if  mean_iou - self.best_loss > self.min_delta:
+            print(f'Mean IOU increased ({self.best_loss:.6f} --> {mean_iou:.6f}).  Resetting counter to 0')
+            self.best_loss = mean_iou
             self.counter = 0
         else:
             self.counter += 1
             print(f'EarlyStopping counter: {self.counter} out of {self.tolerance}')
-            print(f'Best loss: {self.best_loss}, Current loss: {validation_loss}')
+            print(f'Best mIoU: {self.best_loss}, Current mIoU: {mean_iou}')
             if self.counter >= self.tolerance:
                 self.early_stop = True
                 print("Early stopping....")

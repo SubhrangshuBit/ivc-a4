@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import models
-
+manualSeed = 42
+torch.manual_seed(manualSeed)
 class FCN8s(nn.Module):
     """ 
     Implementation of Fully Convolutional Networks with stride 8.
