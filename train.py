@@ -4,38 +4,30 @@ import fcn_dataset
 import os
 from tqdm import tqdm
 import numpy as np
+import pandas as pd
 from PIL import Image
-
+from torch.utils.tensorboard import SummaryWriter
+from fcn_dataset import CamVidDataset, rev_normalize
+from fcn_model import FCN8s
 # Define the device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Define the model
 num_classes = 32
-model = fcn_model.FCN8s(num_classes).to(device)
+model = FCN8s(num_classes).to(device)
 
-# Define the dataset and dataloader
-images_dir_train = "train/"
-labels_dir_train = "train_labels/"
-class_dict_path = "class_dict.csv"
-resolution = (384, 512)
-batch_size = 16
-num_epochs = 50
+
 
 # Define logs
 writer = SummaryWriter()
 
-camvid_dataset_train = fcn_dataset.CamVidDataset(root='CamVid/', images_dir=images_dir_train, labels_dir=labels_dir_train, class_dict_path=class_dict_path, resolution=resolution, crop=True)
-dataloader_train = torch.utils.data.DataLoader(camvid_dataset_train, batch_size=batch_size, shuffle=True, num_workers=4)
-
-images_dir_val = "val/"
-labels_dir_val = "val_labels/"
-camvid_dataset_val = fcn_dataset.CamVidDataset(root='CamVid/', images_dir=images_dir_val, labels_dir=labels_dir_val, class_dict_path=class_dict_path, resolution=resolution, crop=False)
-dataloader_val = torch.utils.data.DataLoader(camvid_dataset_val, batch_size=1, shuffle=False, num_workers=4, drop_last=False)
-
-images_dir_test = "test/"
-labels_dir_test = "test_labels/"
-camvid_dataset_test = fcn_dataset.CamVidDataset(root='CamVid/', images_dir=images_dir_test, labels_dir=labels_dir_test, class_dict_path=class_dict_path, resolution=resolution, crop=False)
-dataloader_test = torch.utils.data.DataLoader(camvid_dataset_test, batch_size=1, shuffle=False, num_workers=4, drop_last=False)
+# Hyperparameters
+resolution = (384, 512)
+batch_size = 16
+num_epochs = 100
+learning_rate = 0.001
+min_delta = 0.1
+patience = 10
 
 # Define the early stopping function
 class EarlyStopping:
@@ -44,22 +36,31 @@ class EarlyStopping:
         self.min_delta = min_delta
         self.counter=0
         self.early_stop=False
+        self.best_loss = float('inf')
 
-    def __call__(self, train_loss, validation_loss):
-        if (validation_loss - train_loss) > self.min_delta:
+    def __call__(self,  validation_loss):
+        """ 
+        If the validation loss is less than the best loss by min_delta, then reset the counter.
+        """
+        if self.best_loss - validation_loss > self.min_delta:
+            print(f'Validation loss decreased ({self.best_loss:.6f} --> {validation_loss:.6f}).  Resetting counter to 0')
+            self.best_loss = validation_loss
+            self.counter = 0
+        else:
             self.counter += 1
+            print(f'EarlyStopping counter: {self.counter} out of {self.tolerance}')
+            print(f'Best loss: {self.best_loss}, Current loss: {validation_loss}')
             if self.counter >= self.tolerance:
                 self.early_stop = True
-
+                print("Early stopping....")
+            
+                
 # Define the loss function and optimizer
 def loss_fn(outputs, labels):
     """ 
     In the original paper, the authors mention a per-pixel multinomial logistic loss, which is equivalent to the standard cross-entropy loss.
     """ 
     return torch.nn.CrossEntropyLoss()(outputs, labels)
-
-
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 def calculate_metrics(pred, target, num_classes):
     """ 
@@ -95,16 +96,17 @@ def eval_model(model, dataloader, device, save_pred=False):
             _, predicted = torch.max(outputs, 1)
             if save_pred:
                 pred_list.append(predicted.cpu().numpy())
-           
+        
         loss = sum(loss_list) / len(loss_list)
         pixel_acc, mean_iou, freq_iou = calculate_metrics(predicted.cpu().numpy(), labels.cpu().numpy(), num_classes)
         print("Validation")
-        print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f}, Loss: {:.4f}'.format(pixel_acc, mean_iou, freq_iou, loss))
+        print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f}, Val Loss: {:.4f}'.format(pixel_acc, mean_iou, freq_iou, loss))
         print('='*20)
 
     if save_pred:
         pred_list = np.concatenate(pred_list, axis=0)
         np.save('test_pred.npy', pred_list)
+        print(f"{len(pred_list)} predictions saved at test_pred.npy")
     model.train()
     return loss, pixel_acc, mean_iou, freq_iou
 
@@ -143,54 +145,104 @@ def visualize_model(model, dataloader, device):
             
     model.train()
     
-# Train the model
-loss_list = []
-epoch_train_loss = []
-early_stopping = EarlyStopping(tolerance=10, min_delta=10)
-for epoch in range(num_epochs):
-    for i, (images, labels) in enumerate(dataloader_train):
-        images, labels = images.to(device), labels.to(device)
 
-        # Forward pass
-        outputs = model(images)
-        loss = loss_fn(outputs, labels)
 
-        # Backward pass and optimize
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        loss_list.append(loss.item())
-        epoch_train_loss.append(loss.item())
+# main function
+if __name__ == "__main__":
 
-        if (i+1) % 10 == 0:
-            print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, len(dataloader_train), sum(loss_list)/len(loss_list)))
-            loss_list = []
+    # Define the dataset and dataloader
 
-    train_loss = sum(epoch_train_loss)/len(epoch_train_loss)
-    pixel_acc, mean_iou, freq_iou = calculate_metrics(torch.argmax(outputs, dim=1).cpu().numpy(), labels.cpu().numpy(), num_classes)
-    print("Train")
-    print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f}'.format(pixel_acc, mean_iou, freq_iou))
+    class_dict_path = "class_dict.csv"
+    class_dict = pd.read_csv("CamVid/" + class_dict_path)
+
+
+
+    images_dir = "train/"
+    labels_dir = "train_labels/"
+    camvid_dataset = CamVidDataset(root='CamVid/', images_dir=images_dir, labels_dir=labels_dir, class_dict_path=class_dict_path, resolution=resolution)
+    train_loader = torch.utils.data.DataLoader(camvid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+
+    val_images_dir = "val/"
+    val_labels_dir = "val_labels/"
+    val_camvid_dataset = CamVidDataset(root='CamVid/', images_dir=val_images_dir, labels_dir=val_labels_dir, class_dict_path=class_dict_path, resolution=resolution)
+    val_loader = torch.utils.data.DataLoader(val_camvid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+
+    test_images_dir = "test/"
+    test_labels_dir = "test_labels/"
+    test_camvid_dataset = CamVidDataset(root='CamVid/', images_dir=test_images_dir, labels_dir=test_labels_dir, class_dict_path=class_dict_path, resolution=resolution)
+    test_loader = torch.utils.data.DataLoader(test_camvid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+
+    print("Number of classes:", class_dict.shape[0])
+    print(f"Train dataset size: {len(camvid_dataset)}")
+    print(f"Validation dataset size: {len(val_camvid_dataset)}")
+    print(f"Test dataset size: {len(test_camvid_dataset)}")
+    # Define the device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    model = FCN8s(num_classes=32).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    # Train the model
+    loss_list = []
+    epoch_train_loss = []
+    early_stopping = EarlyStopping(tolerance=patience, min_delta=min_delta)
+    
+    for epoch in range(num_epochs):
+        for i, (images, labels) in (enumerate(train_loader)):
+            images, labels = images.to(device), labels.to(device)
+
+            # Forward pass
+            outputs = model(images)
+            loss = loss_fn(outputs, labels)
+
+            # Backward pass and optimize
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            loss_list.append(loss.item())
+            epoch_train_loss.append(loss.item())
+
+            if (i+1) % 10 == 0:
+                print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, len(train_loader), sum(loss_list)/len(loss_list)))
+                loss_list = []
+
+        train_loss = sum(epoch_train_loss)/len(epoch_train_loss)
+        pixel_acc, mean_iou, freq_iou = calculate_metrics(torch.argmax(outputs, dim=1).cpu().numpy(), labels.cpu().numpy(), num_classes)
+        print("Train")
+        print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f} Train Loss: {:.4f}'.format(pixel_acc, mean_iou, freq_iou, train_loss))
+        print('='*20)
+
+        # eval the model        
+        eval_loss, eval_pixel_acc, eval_mean_iou, eval_freq_iou = eval_model(model, val_loader, device)
+
+        # Log performance
+        writer.add_scalars("Loss", {"train": train_loss, "val": eval_loss}, epoch)
+        writer.add_scalars("PixAcc", {"train": pixel_acc, "val": eval_pixel_acc}, epoch)
+        writer.add_scalars("meanIOU", {"train": mean_iou, "val": eval_mean_iou}, epoch)
+
+        # save the best model
+
+        if eval_loss < early_stopping.best_loss:
+            print(f'Validation loss decreased ({early_stopping.best_loss:.6f} --> {eval_loss:.6f}).  Saving model ...')
+            early_stopping.best_loss = eval_loss
+            model_save_path = "best_model.pth"
+            # save the model and the optimizer
+            torch.save(model.state_dict(), model_save_path)
+
+        # early stoppping
+        early_stopping( eval_loss)
+        if early_stopping.early_stop:
+            print("We are at epoch:", epoch)
+            break
+    writer.close()
     print('='*20)
+    print('Finished Training, evaluating the best model on the test set')
 
-    # eval the model        
-    eval_loss, eval_pixel_acc, eval_mean_iou, eval_freq_iou = eval_model(model, val_loader, device)
+    # load the best model
+    best_model = FCN8s(num_classes=32).to(device)
+    best_model.load_state_dict(torch.load("best_model.pth"))
 
-    # Log performance
-    writer.add_scalars("Loss", {"train": train_loss, "val": eval_loss}, epoch)
-    writer.add_scalars("PixAcc", {"train": pixel_acc, "val": eval_pixel_acc}, epoch)
-    writer.add_scalars("meanIOU", {"train": mean_iou, "val": eval_mean_iou}, epoch)
 
-    # early stoppping
-    early_stopping(train_loss, eval_loss)
-    if early_stopping.early_stop:
-      print("We are at epoch:", epoch)
-      break
-
-print('='*20)
-print('Finished Training, evaluating the model on the test set')
-eval_model(model, dataloader_test, device, save_pred=True)
-
-print('='*20)
-print('Visualizing the model on the test set, the results will be saved in the vis/ directory')
-visualize_model(model, dataloader_test, device)
-
+    eval_model(best_model, test_loader, device, save_pred=True)
+    print('='*20)
+    print('Visualizing the model on the test set, the results will be saved in the vis/ directory')
+    visualize_model(model, test_loader, device)

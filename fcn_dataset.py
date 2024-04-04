@@ -34,6 +34,7 @@ class CamVidDataset(Dataset):
         self.images = [os.path.join(root, images_dir, img) for img in sorted(os.listdir(os.path.join(root, images_dir)))]
         self.labels = [os.path.join(root, labels_dir, lbl) for lbl in sorted(os.listdir(os.path.join(root, labels_dir)))]
 
+
     def __len__(self):
         return len(self.images)
 
@@ -49,11 +50,11 @@ class CamVidDataset(Dataset):
             image, label = paired_resize(image, label, self.resolution)
             
         # image to tensor and normalize
-        
         image = transforms.ToTensor()(image)
         image = normalize(image)
         label = torch.tensor(np.array(label)).long()
         return image, label
+
 
     def parse_class_dict(self, class_dict_path):
         # return a dictionary that maps class id (0-31) to a tuple ((R,G,B), class_name)

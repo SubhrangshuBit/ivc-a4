@@ -1,0 +1,257 @@
+Epoch [1/100], Step [10/93], Loss: 2.6851
+Epoch [1/100], Step [20/93], Loss: 1.7953
+Epoch [1/100], Step [30/93], Loss: 1.3117
+Epoch [1/100], Step [40/93], Loss: 1.2231
+Epoch [1/100], Step [50/93], Loss: 1.2390
+Epoch [1/100], Step [60/93], Loss: 1.0606
+Epoch [1/100], Step [70/93], Loss: 0.9442
+Epoch [1/100], Step [80/93], Loss: 0.8573
+Epoch [1/100], Step [90/93], Loss: 0.9093
+Train
+Pixel accuracy: 0.8713, Mean IoU: 0.1495, Frequency weighted IoU: 0.7678
+====================
+Validation
+Pixel accuracy: 0.7841, Mean IoU: 0.1255, Frequency weighted IoU: 0.6354, Val Loss: 0.9169
+====================
+EarlyStopping counter: 1 out of 15
+Best loss: 0.9169270324707032, Current loss: 0.9169270324707032
+Epoch [2/100], Step [10/93], Loss: 0.8052
+Epoch [2/100], Step [20/93], Loss: 0.8838
+Epoch [2/100], Step [30/93], Loss: 0.8472
+Epoch [2/100], Step [40/93], Loss: 0.7789
+Epoch [2/100], Step [50/93], Loss: 0.7930
+Epoch [2/100], Step [60/93], Loss: 0.7451
+Epoch [2/100], Step [70/93], Loss: 0.7345
+Epoch [2/100], Step [80/93], Loss: 0.6558
+Epoch [2/100], Step [90/93], Loss: 0.6679
+Train
+Pixel accuracy: 0.5268, Mean IoU: 0.0790, Frequency weighted IoU: 0.4725
+====================
+Validation
+Pixel accuracy: 0.8378, Mean IoU: 0.1707, Frequency weighted IoU: 0.7449, Val Loss: 0.7370
+====================
+EarlyStopping counter: 2 out of 15
+Best loss: 0.7369894719123841, Current loss: 0.7369894719123841
+Epoch [3/100], Step [10/93], Loss: 0.8010
+Epoch [3/100], Step [20/93], Loss: 0.7768
+Epoch [3/100], Step [30/93], Loss: 0.6479
+Epoch [3/100], Step [40/93], Loss: 0.6443
+Epoch [3/100], Step [50/93], Loss: 0.7309
+Epoch [3/100], Step [60/93], Loss: 0.6685
+Epoch [3/100], Step [70/93], Loss: 0.6736
+Epoch [3/100], Step [80/93], Loss: 0.6570
+Epoch [3/100], Step [90/93], Loss: 0.6472
+Train
+Pixel accuracy: 0.9276, Mean IoU: 0.2130, Frequency weighted IoU: 0.8705
+====================
+Validation
+Pixel accuracy: 0.8549, Mean IoU: 0.1883, Frequency weighted IoU: 0.7550, Val Loss: 0.6270
+====================
+EarlyStopping counter: 3 out of 15
+Best loss: 0.6269852364063263, Current loss: 0.6269852364063263
+Epoch [4/100], Step [10/93], Loss: 0.6077
+Epoch [4/100], Step [20/93], Loss: 0.6745
+Epoch [4/100], Step [30/93], Loss: 0.5849
+Epoch [4/100], Step [40/93], Loss: 0.6312
+Epoch [4/100], Step [50/93], Loss: 0.5907
+Epoch [4/100], Step [60/93], Loss: 0.5713
+Epoch [4/100], Step [70/93], Loss: 0.5580
+Epoch [4/100], Step [80/93], Loss: 0.6449
+Epoch [4/100], Step [90/93], Loss: 0.5986
+Train
+Pixel accuracy: 0.7924, Mean IoU: 0.1529, Frequency weighted IoU: 0.6725
+====================
+Validation
+Pixel accuracy: 0.7556, Mean IoU: 0.1432, Frequency weighted IoU: 0.6348, Val Loss: 0.5998
+====================
+EarlyStopping counter: 4 out of 15
+Best loss: 0.599840543270111, Current loss: 0.599840543270111
+Epoch [5/100], Step [10/93], Loss: 0.5703
+Epoch [5/100], Step [20/93], Loss: 0.5896
+Epoch [5/100], Step [30/93], Loss: 0.5894
+Epoch [5/100], Step [40/93], Loss: 0.6072
+Epoch [5/100], Step [50/93], Loss: 0.6794
+Epoch [5/100], Step [60/93], Loss: 0.6375
+Epoch [5/100], Step [70/93], Loss: 0.5971
+Epoch [5/100], Step [80/93], Loss: 0.5031
+Epoch [5/100], Step [90/93], Loss: 0.4790
+Train
+Pixel accuracy: 0.9205, Mean IoU: 0.2267, Frequency weighted IoU: 0.8643
+====================
+Validation
+Pixel accuracy: 0.8216, Mean IoU: 0.1746, Frequency weighted IoU: 0.7090, Val Loss: 0.5975
+====================
+EarlyStopping counter: 5 out of 15
+Best loss: 0.5974511551856995, Current loss: 0.5974511551856995
+Epoch [6/100], Step [10/93], Loss: 0.5634
+Epoch [6/100], Step [20/93], Loss: 0.5110
+Epoch [6/100], Step [30/93], Loss: 0.5366
+Epoch [6/100], Step [40/93], Loss: 0.5107
+Epoch [6/100], Step [50/93], Loss: 0.4995
+Epoch [6/100], Step [60/93], Loss: 0.5476
+Epoch [6/100], Step [70/93], Loss: 0.5708
+Epoch [6/100], Step [80/93], Loss: 0.4522
+Epoch [6/100], Step [90/93], Loss: 0.5573
+Train
+Pixel accuracy: 0.8473, Mean IoU: 0.1759, Frequency weighted IoU: 0.7425
+====================
+Validation
+Pixel accuracy: 0.8134, Mean IoU: 0.2370, Frequency weighted IoU: 0.6900, Val Loss: 0.5311
+====================
+EarlyStopping counter: 6 out of 15
+Best loss: 0.5311328148841858, Current loss: 0.5311328148841858
+Epoch [7/100], Step [10/93], Loss: 0.4887
+Epoch [7/100], Step [20/93], Loss: 0.4548
+Epoch [7/100], Step [30/93], Loss: 0.4342
+Epoch [7/100], Step [40/93], Loss: 0.5226
+Epoch [7/100], Step [50/93], Loss: 0.4815
+Epoch [7/100], Step [60/93], Loss: 0.5711
+Epoch [7/100], Step [70/93], Loss: 0.5905
+Epoch [7/100], Step [80/93], Loss: 0.5488
+Epoch [7/100], Step [90/93], Loss: 0.5131
+Train
+Pixel accuracy: 0.9250, Mean IoU: 0.1608, Frequency weighted IoU: 0.8813
+====================
+Validation
+Pixel accuracy: 0.7969, Mean IoU: 0.2003, Frequency weighted IoU: 0.6696, Val Loss: 0.5678
+====================
+EarlyStopping counter: 7 out of 15
+Best loss: 0.5311328148841858, Current loss: 0.5677670061588287
+Epoch [8/100], Step [10/93], Loss: 0.5066
+Epoch [8/100], Step [20/93], Loss: 0.5038
+Epoch [8/100], Step [30/93], Loss: 0.5082
+Epoch [8/100], Step [40/93], Loss: 0.4598
+Epoch [8/100], Step [50/93], Loss: 0.4409
+Epoch [8/100], Step [60/93], Loss: 0.4656
+Epoch [8/100], Step [70/93], Loss: 0.4574
+Epoch [8/100], Step [80/93], Loss: 0.4730
+Epoch [8/100], Step [90/93], Loss: 0.4462
+Train
+Pixel accuracy: 0.9081, Mean IoU: 0.2976, Frequency weighted IoU: 0.8338
+====================
+Validation
+Pixel accuracy: 0.8374, Mean IoU: 0.2396, Frequency weighted IoU: 0.7263, Val Loss: 0.5313
+====================
+EarlyStopping counter: 8 out of 15
+Best loss: 0.5311328148841858, Current loss: 0.531276285648346
+Epoch [9/100], Step [10/93], Loss: 0.4086
+Epoch [9/100], Step [20/93], Loss: 0.4455
+Epoch [9/100], Step [30/93], Loss: 0.4246
+Epoch [9/100], Step [40/93], Loss: 0.3840
+Epoch [9/100], Step [50/93], Loss: 0.4205
+Epoch [9/100], Step [60/93], Loss: 0.3845
+Epoch [9/100], Step [70/93], Loss: 0.4941
+Epoch [9/100], Step [80/93], Loss: 0.4452
+Epoch [9/100], Step [90/93], Loss: 0.4076
+Train
+Pixel accuracy: 0.9209, Mean IoU: 0.2618, Frequency weighted IoU: 0.8667
+====================
+Validation
+Pixel accuracy: 0.8588, Mean IoU: 0.2787, Frequency weighted IoU: 0.7681, Val Loss: 0.4884
+====================
+EarlyStopping counter: 9 out of 15
+Best loss: 0.4883820140361786, Current loss: 0.4883820140361786
+Epoch [10/100], Step [10/93], Loss: 0.4175
+Epoch [10/100], Step [20/93], Loss: 0.4210
+Epoch [10/100], Step [30/93], Loss: 0.3580
+Epoch [10/100], Step [40/93], Loss: 0.3800
+Epoch [10/100], Step [50/93], Loss: 0.4069
+Epoch [10/100], Step [60/93], Loss: 0.4259
+Epoch [10/100], Step [70/93], Loss: 0.3955
+Epoch [10/100], Step [80/93], Loss: 0.3714
+Epoch [10/100], Step [90/93], Loss: 0.3900
+Train
+Pixel accuracy: 0.9038, Mean IoU: 0.1969, Frequency weighted IoU: 0.8343
+====================
+Validation
+Pixel accuracy: 0.8264, Mean IoU: 0.2456, Frequency weighted IoU: 0.7117, Val Loss: 0.4911
+====================
+EarlyStopping counter: 10 out of 15
+Best loss: 0.4883820140361786, Current loss: 0.4911405980587006
+Epoch [11/100], Step [10/93], Loss: 0.3688
+Epoch [11/100], Step [20/93], Loss: 0.3708
+Epoch [11/100], Step [30/93], Loss: 0.3948
+Epoch [11/100], Step [40/93], Loss: 0.3311
+Epoch [11/100], Step [50/93], Loss: 0.4055
+Epoch [11/100], Step [60/93], Loss: 0.3855
+Epoch [11/100], Step [70/93], Loss: 0.3477
+Epoch [11/100], Step [80/93], Loss: 0.3856
+Epoch [11/100], Step [90/93], Loss: 0.4048
+Train
+Pixel accuracy: 0.9188, Mean IoU: 0.1852, Frequency weighted IoU: 0.8685
+====================
+Validation
+Pixel accuracy: 0.8813, Mean IoU: 0.3538, Frequency weighted IoU: 0.8004, Val Loss: 0.4757
+====================
+EarlyStopping counter: 11 out of 15
+Best loss: 0.4756751298904419, Current loss: 0.4756751298904419
+Epoch [12/100], Step [10/93], Loss: 0.3689
+Epoch [12/100], Step [20/93], Loss: 0.3780
+Epoch [12/100], Step [30/93], Loss: 0.3464
+Epoch [12/100], Step [40/93], Loss: 0.3781
+Epoch [12/100], Step [50/93], Loss: 0.3739
+Epoch [12/100], Step [60/93], Loss: 0.3369
+Epoch [12/100], Step [70/93], Loss: 0.3245
+Epoch [12/100], Step [80/93], Loss: 0.2933
+Epoch [12/100], Step [90/93], Loss: 0.3199
+Train
+Pixel accuracy: 0.8892, Mean IoU: 0.2641, Frequency weighted IoU: 0.8073
+====================
+Validation
+Pixel accuracy: 0.8743, Mean IoU: 0.3053, Frequency weighted IoU: 0.7868, Val Loss: 0.4441
+====================
+EarlyStopping counter: 12 out of 15
+Best loss: 0.4440767240524292, Current loss: 0.4440767240524292
+Epoch [13/100], Step [10/93], Loss: 0.3173
+Epoch [13/100], Step [20/93], Loss: 0.3153
+Epoch [13/100], Step [30/93], Loss: 0.3407
+Epoch [13/100], Step [40/93], Loss: 0.3778
+Epoch [13/100], Step [50/93], Loss: 0.3256
+Epoch [13/100], Step [60/93], Loss: 0.3539
+Epoch [13/100], Step [70/93], Loss: 0.3388
+Epoch [13/100], Step [80/93], Loss: 0.3195
+Epoch [13/100], Step [90/93], Loss: 0.3514
+Train
+Pixel accuracy: 0.9247, Mean IoU: 0.2348, Frequency weighted IoU: 0.8644
+====================
+Validation
+Pixel accuracy: 0.8763, Mean IoU: 0.3107, Frequency weighted IoU: 0.7847, Val Loss: 0.4511
+====================
+EarlyStopping counter: 13 out of 15
+Best loss: 0.4440767240524292, Current loss: 0.45105316162109377
+Epoch [14/100], Step [10/93], Loss: 0.3090
+Epoch [14/100], Step [20/93], Loss: 0.3131
+Epoch [14/100], Step [30/93], Loss: 0.3174
+Epoch [14/100], Step [40/93], Loss: 0.3279
+Epoch [14/100], Step [50/93], Loss: 0.2663
+Epoch [14/100], Step [60/93], Loss: 0.3298
+Epoch [14/100], Step [70/93], Loss: 0.3083
+Epoch [14/100], Step [80/93], Loss: 0.3038
+Epoch [14/100], Step [90/93], Loss: 0.2950
+Train
+Pixel accuracy: 0.9416, Mean IoU: 0.1878, Frequency weighted IoU: 0.8949
+====================
+Validation
+Pixel accuracy: 0.8663, Mean IoU: 0.3296, Frequency weighted IoU: 0.7717, Val Loss: 0.4608
+====================
+EarlyStopping counter: 14 out of 15
+Best loss: 0.4440767240524292, Current loss: 0.4608009761571884
+Epoch [15/100], Step [10/93], Loss: 0.2595
+Epoch [15/100], Step [20/93], Loss: 0.2557
+Epoch [15/100], Step [30/93], Loss: 0.3076
+Epoch [15/100], Step [40/93], Loss: 0.2851
+Epoch [15/100], Step [50/93], Loss: 0.2951
+Epoch [15/100], Step [60/93], Loss: 0.2834
+Epoch [15/100], Step [70/93], Loss: 0.3219
+Epoch [15/100], Step [80/93], Loss: 0.3173
+Epoch [15/100], Step [90/93], Loss: 0.3331
+Train
+Pixel accuracy: 0.9049, Mean IoU: 0.1618, Frequency weighted IoU: 0.8323
+====================
+Validation
+Pixel accuracy: 0.9012, Mean IoU: 0.3562, Frequency weighted IoU: 0.8269, Val Loss: 0.4578
+====================
+EarlyStopping counter: 15 out of 15
+Best loss: 0.4440767240524292, Current loss: 0.45784897208213804
+Early stopping....
+We are at epoch: 14
