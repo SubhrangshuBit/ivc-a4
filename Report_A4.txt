@@ -1,0 +1,133 @@
+PAPER SUMMARY: FULLY CONVOLUTIONAL NETWORKS FOR SEMANTIC SEGMENTATION
+
+Nazia Tasnim
+Subhrangshu Bit
+
+Fully Convolutional Networks (FCNs), introduced by Long et al. in their seminal paper "Fully
+Convolutional Networks for Semantic Segmentation," have revolutionized the field of semantic
+segmentation by adapting deep convolutional neural networks (CNNs) for dense prediction tasks.
+It addresses the limitations of traditional CNN architectures designed for image classification, by
+replacing fully connected layers with convolutional layers and introducing skip connections to fuse
+information from different scales. In this summary, we will briefly discuss the core differences
+between classification and segmentation as a deep learning prediction task. Then we will explain how
+FCNs address the conflicts between these tasks, and introduce the three different versions of FCNs that
+balance the trade-off between spatial precision and the use of context. Furthermore, we will compare
+the evaluation metrics used in the paper, including pixel accuracy and intersection-over-union (IU),
+and highlight their strengths and limitations. Finally, we will explore the limitations of FCNs and
+suggest potential directions for further improvements in semantic segmentation.
+Keywords Semantic Segmentation · Convolutional Networks
+
+1. Difference between the task of classification and segmentation
+
+In image classification tasks, the goal is to predict a single class label for an entire input image. The network is designed
+to recognize the presence of certain high-level semantic concepts or object categories within the image, thus providing a
+holistic understanding of content. When this particular paper was being written, classification was typically performed
+through a series of convolutional and pooling layers that gradually increase the receptive field and reduce the spatial
+resolution, followed by one or more fully connected layers that output the final class probabilities.
+Segmentation is a much more fine-grained task. Instead of a single label for the entire image, the output is a dense
+pixel-wise labeling that assigns each pixel to one of several pre-defined semantic categories. The network must not only
+recognize the presence of different semantic classes but also determine the precise spatial extent and boundaries of each
+object or region.
+Some of the significant conflicting aspects between these two tasks are as following:
+• Classification networks typically reduce the spatial resolution through pooling layers, which discard precise
+spatial information . However, Segmentation networks preserve and utilize fine-grained spatial information
+throughout the layers to perform object localization.
+• The final fully connected layers at the end of classification layers capture global context and long-range
+dependencies. But this again discards the spatial arrangement of features, which is crucial for segmentation.
+• Classification nets are designed to be invariant to local transformations, meaning the output remains unchanged
+under certain distortions such as translations, rotations, scale changes, and occlusions - focusing on the most
+discriminative features that are indicative of each class. This is complicated for Segmentation networks, where
+the output labels should change in correspondence with the input transformations.
+
+
+
+2. FCN in Details
+
+FCNs are designed to adapt classification networks for dense prediction tasks like semantic segmentation. To do so,
+they build upon prior classification architectures and introduce the following modifications :
+• For starters, FCNs remove the final fully connected layers found in classification nets, and replace these layers
+with convolutional layers that preserve the spatial dimensions of the features. This enables a classification
+network to output a heatmap. This also allows the network to handle input images of arbitrary size and produce
+correspondingly-sized output maps.
+• To recover the spatial resolution lost due to pooling layers, FCNs incorporate learned upsampling layers. These
+layers use transposed convolutions (also known as deconvolutions) to gradually increase the spatial dimensions
+of the feature maps, ultimately producing an output with the same size as the input image.
+• The authors also experimented with the shift-and-stitch technique on input-output and training with sampling.
+Neither proved to be useful during their experimentation.
+The paper introduces different versions of FCNs that explore the trade-off between spatial precision and the
+use of context. The experiments essentially try to refine the convnets by fusing information from layers, varying the
+strides, and analyzing segmentation details
+
+
+• FCN-32s: The stride of this layer is 32 pixels. In this simplest version, only high-level features from the
+last convolutional layer (after pool5) of the classification network are used. This version captures high-level
+semantic information, and the outputs are very coarse.
+• FCN-16s: To improve spatial precision, FCN-16s combines predictions from both the final layer (after pool5)
+and an earlier layer (pool4) with a stride of 16 pixels. The predictions from pool4 are upsampled by a factor of
+2 and fused with the predictions from the final layer. This fusion allows the network to incorporate finer-grained
+spatial information while still leveraging the high-level semantic features. The combined predictions are then
+upsampled to the input resolution.
+• FCN-8s: This version further improves spatial precision by incorporating predictions from an even earlier
+layer (pool3) with a stride of 8 pixels. The predictions from pool3 are upsampled and fused with the combined
+predictions from pool4 and the final layer. This version provides the finest spatial details but comes with
+increased computational cost due to the additional upsampling and fusion operations.
+The different versions of FCNs, namely FCN-32s, FCN-16s, and FCN-8s, demonstrate the trade-off between spatial
+precision and the use of contextual information. The paper demonstrates that FCN-8s achieves the best performance on
+the PASCAL VOC segmentation benchmark, highlighting the importance of leveraging both high-level semantics and
+fine spatial details for accurate segmentation. On the other hands, FCN-32s are more computationally efficient.
+
+
+3. Evaluation
+
+The authors reported performance using four standard metrics used to evaluate semantic segmentation task.
+
+
+3.1 Compare Pixel Accuracy and IU
+• Pixel Accuracy: measures the percentage of pixels in the image that are correctly classified. It is computed
+by dividing the number of correctly labeled pixels by the total number of pixels in the image.
+• Intersection over Union (IU): metric that evaluates the overlap between the predicted segmentation and
+the ground truth segmentation for each class. It is computed by dividing the area of intersection between the
+predicted and ground truth masks by the area of their union.
+
+Pixel accuracy treats all pixels equally, regardless of their semantic importance. As a result, it may not adequately reflect
+the model’s performance on small objects or fine-grained details, which are often crucial for practical applications.
+For example, background classes like "sky" or "road" may occupy a large portion of the image, while smaller objects
+like "person" or "animal" may have fewer pixels. In such cases, a model that correctly predicts the dominant classes
+but performs poorly on the smaller classes can still achieve high pixel accuracy. On the contrary, IU treats each class
+independently and computes the overlap for each class separately. This prevents the metric from being dominated by
+large classes and provides a more balanced assessment of performance across all classes.
+
+3.2 Compare Mean IU and Frequency-weighted IU
+• Mean IU: computed by taking the unweighted average of the per-class IU scores. It treats all classes equally,
+regardless of their pixel frequency in the dataset.
+• Frequency-weighted IU: computed by weighting each class’s IU score by the proportion of pixels that belong
+to that class in the dataset. This gives more importance to classes with a larger number of pixels.
+
+From the definitions, it is clear that Mean IU provides an overall measure of the model’s performance across all classes,
+without being biased towards larger or more frequent classes. However, frequency-weighted IU may be more suitable
+when the performance on larger classes is more critical for the application.
+
+4. Limitations and Future Directions
+
+The paper itself doesn’t mention any specific limitations of the proposed architecture. However, the following limitations
+can be discussed:
+
+• from the implementation details, it is easy to deduce that such fully connected models have high computational
+costs because convolution is a comparatively costly operation.
+• these models have a large number of parameters making them prone to overfitting.
+• while FCNs assign each pixel to a predefined class, they do not inherently distinguish between individual
+instances of the same class.
+FCNs have laid the foundation for a new paradigm in semantic segmentation, inspiring numerous follow-up works
+and innovations. After its publications many techniques have been utilized and proposed, which can be considered as
+proposed "future works" for the time. These include:
+• Instance-aware segmentation
+• Encoder-decoder architectures, such as SegNet and DeconvNet
+• Attention mechanisms to improve the context aggregation and focus on relevant regions of the image
+
+5. Resources
+
+1. Gemini LLM
+2. Quora
+3. StackOverflow
+4. The original paper
+

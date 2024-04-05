@@ -1,0 +1,11 @@
+Both contributors worked equally to perform the experiments and complete the coding assignments. 
+
+Sections of the reports were also distributed among the contributors for writing.
+
+File Description:
+fcn_dataset.py: Contains the dataset class for the FCN model, with the implemented `rgb_to_class_id` function
+fcn_model.py: Contains the FCN model class with the implemented forward pass
+train.py: Contains the training loop for the FCN model. Has the evaluation module, loss function, EarlyStopping class, and metric calculation functions.
+training_log.txt: Contains the training log for the FCN model
+FCN.ipynb: Contains the off-the-shelf demonstration of the FCN model
+Report_A4.txt: Contains the report for the FCN model (includes answer to all four required questions)
